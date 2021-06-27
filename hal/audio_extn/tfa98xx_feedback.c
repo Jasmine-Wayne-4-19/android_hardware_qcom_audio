@@ -52,7 +52,7 @@ static struct pcm_config pcm_config_tfa98xx_fb = {
     .rate = 48000,
     .period_size = 256,
     .period_count = 4,
-    .format = PCM_FORMAT_S16_LE,
+    .format = PCM_FORMAT_S24_LE,
     .start_threshold = 0,
     .stop_threshold = INT_MAX,
     .avail_min = 0,
@@ -78,7 +78,7 @@ static bool can_enable_feedback_on_device(snd_device_t snd_device)
 
     return ret;
 }
-int audio_extn_tfa98xx_start_feedback(struct audio_device *adev, 
+int audio_extn_tfa98xx_start_feedback(struct audio_device *adev,
 													 snd_device_t snd_device)
 {
     struct audio_usecase *uc_info_tx = NULL;
@@ -95,12 +95,12 @@ int audio_extn_tfa98xx_start_feedback(struct audio_device *adev,
     }
 
     if (!pcm_tx) {
-		
+
 		uc_info_tx = (struct audio_usecase *)calloc(1, sizeof(struct audio_usecase));
 		if (!uc_info_tx) {
 			return -ENOMEM;
 		}
-		
+
         uc_info_tx->id = USECASE_AUDIO_SPKR_CALIB_TX;
         uc_info_tx->type = PCM_CAPTURE;
         uc_info_tx->in_snd_device = SND_DEVICE_IN_CAPTURE_VI_FEEDBACK;
@@ -138,7 +138,7 @@ exit:
      if (ret) {
         if (pcm_tx)
             pcm_close(pcm_tx);
-		
+
         pcm_tx = NULL;
 
 		disable_snd_device(adev, SND_DEVICE_IN_CAPTURE_VI_FEEDBACK);
@@ -148,17 +148,17 @@ exit:
        		uc_info_tx->type = PCM_CAPTURE;
         	uc_info_tx->in_snd_device = SND_DEVICE_IN_CAPTURE_VI_FEEDBACK;
         	uc_info_tx->out_snd_device = SND_DEVICE_NONE;
-       
+
         	disable_audio_route(adev, uc_info_tx);
         	free(uc_info_tx);
 		}
-    } 
-	 
+    }
+
     ALOGV("%s: Exit", __func__);
     return ret;
 }
 
-void audio_extn_tfa98xx_stop_feedback(struct audio_device *adev, 
+void audio_extn_tfa98xx_stop_feedback(struct audio_device *adev,
 													 snd_device_t snd_device)
 {
     struct audio_usecase *uc_info_tx;
@@ -169,10 +169,10 @@ void audio_extn_tfa98xx_stop_feedback(struct audio_device *adev,
     ALOGV("%s: Entry", __func__);
 
     uc_info_tx = get_usecase_from_list(adev, USECASE_AUDIO_SPKR_CALIB_TX);
-	
+
    	if (pcm_tx)
        	pcm_close(pcm_tx);
-	
+
    	pcm_tx = NULL;
    	disable_snd_device(adev, SND_DEVICE_IN_CAPTURE_VI_FEEDBACK);
    	if (uc_info_tx) {
@@ -180,7 +180,7 @@ void audio_extn_tfa98xx_stop_feedback(struct audio_device *adev,
        	disable_audio_route(adev, uc_info_tx);
        	free(uc_info_tx);
    	}
-   
+
     ALOGV("%s: Exit", __func__);
 }
 
